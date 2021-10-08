@@ -22,7 +22,7 @@ class DatabaseManager:
         self._execute(
             f"""
             CREATE TABLE IF NOT EXISTS {table_name}
-            ({', '.join(columns_with_types)}
+            ({', '.join(columns_with_types)})
             """
         )
 
@@ -66,7 +66,4 @@ class DatabaseManager:
         if order_by:
             query += f" ORDER BY {order_by}"
 
-        return self._execute(
-            query,
-            tuple(criteria.values())
-        )
+        return self._execute(query, tuple(criteria.values()))
