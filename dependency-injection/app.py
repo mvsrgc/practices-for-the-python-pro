@@ -27,7 +27,7 @@ class App:
 if __name__ == "__main__":
     import sys
     from urban_climate_csv import DataSource
-    from matplotlib_plot import Plot
+    from plotly_plot import Plot
 
     file_name = sys.argv[1]
     app = App(DataSource(), Plot())
