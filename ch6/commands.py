@@ -1,3 +1,5 @@
+from abc import abstractmethod
+
 import databasemanager
 import sys
 from datetime import datetime
@@ -6,7 +8,13 @@ import requests
 db = databasemanager.DatabaseManager("bookmarks.db")
 
 
-class ImportGithubStarsCommand:
+class Command:
+    @abstractmethod
+    def execute(self, data):
+        raise NotImplementedError()
+
+
+class ImportGithubStarsCommand(Command):
     def _extract_bookmark_info(self, repo):
         return {
             "title": repo["name"],
@@ -46,8 +54,8 @@ class ImportGithubStarsCommand:
             return f"Imported {bookmarks_imported} bookmarks from starred repos!"
 
 
-class CreateBookmarksTableCommand:
-    def execute(self):
+class CreateBookmarksTableCommand(Command):
+    def execute(self, data=None):
         db.create_table(
             "bookmarks",
             {
@@ -60,27 +68,27 @@ class CreateBookmarksTableCommand:
         )
 
 
-class AddBookmarkCommand:
+class AddBookmarkCommand(Command):
     def execute(self, data, timestamp=None):
         data["date_added"] = timestamp or datetime.utcnow().isoformat()
         db.add("bookmarks", data)
         return "Bookmark added!"
 
 
-class ListBookmarksCommand:
+class ListBookmarksCommand(Command):
     def __init__(self, order_by="date_added"):
         self.order_by = order_by
 
-    def execute(self):
+    def execute(self, data=None):
         return db.select("bookmarks", order_by=self.order_by).fetchall()
 
 
-class DeleteBookmarkCommand:
+class DeleteBookmarkCommand(Command):
     def execute(self, data):
         db.delete("bookmarks", {id: data})
         return "Bookmark deleted!"
 
 
-class QuitCommand:
-    def execute(self):
+class QuitCommand(Command):
+    def execute(self, data=None):
         sys.exit()

@@ -23,7 +23,7 @@ class Option:
 
     def choose(self):  # <4>
         data = self.prep_call() if self.prep_call else None  # <5>
-        message = self.command.execute(data) if data else self.command.execute()  # <6>
+        message = self.command.execute(data)
         self._handle_message(message)
 
     def __str__(self):  # <7>
@@ -72,6 +72,16 @@ def get_bookmark_id_for_deletion():  # <6>
     return get_user_input("Enter a bookmark ID to delete")
 
 
+def get_github_import_options():
+    return {
+        "github_username": get_user_input("Github username"),
+        "preserve_timestamps": get_user_input(
+            "Preserve timestamps [Y/n]", required=False
+        )
+        in {"Y", "y", "None"},
+    }
+
+
 def loop():  # <1>
     clear_screen()
 
@@ -91,6 +101,11 @@ def loop():  # <1>
                 "Delete a bookmark",
                 commands.DeleteBookmarkCommand(),
                 prep_call=get_bookmark_id_for_deletion,
+            ),
+            "G": Option(
+                "Import Github Stars",
+                commands.ImportGithubStarsCommand(),
+                prep_call=get_github_import_options(),
             ),
             "Q": Option("Quit", commands.QuitCommand()),
         }
